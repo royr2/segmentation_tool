@@ -34,6 +34,8 @@ fluidPage(
     ),
     
     # Plot output
-    column(10, plotOutput("tree_plot"))
+    column(10, 
+           verbatimTextOutput("data_stats"),
+           plotOutput("tree_plot"))
   )
 )

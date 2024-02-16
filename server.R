@@ -5,12 +5,28 @@ function(input, output, session) {
   
   # Read file and update inputs 
   observeEvent(input$input_file, {
+    
+    show_modal_spinner()
+    
     model_data <<- read.csv(input$input_file$datapath)
     model_data <<- as.data.frame(model_data)
     
     # Update input section
     updateSelectInput(session, inputId = "covariates", choices = colnames(model_data), selected = NULL)
     updateSelectInput(session, inputId = "dependent", choices = colnames(model_data), selected = NULL)
+    
+    # Show Data Stats
+    stats_df <- paste0(
+      
+      "---------------------------------------------------------------------", "\n",
+      "Number of Rows:", scales::number(nrow(model_data), big.mark = ","), "\n",
+      "Number of Columns:", scales::number(ncol(model_data)), "\n", 
+      "---------------------------------------------------------------------")
+    
+    output$data_stats <- renderText(stats_df)
+    
+    remove_modal_spinner()
+    
   })
   
   # Reactive expressions
@@ -20,6 +36,8 @@ function(input, output, session) {
   observeEvent(input$run_model, {
     
     form <<- paste0(input$dependent, "~", paste0(input$covariates, collapse = "+"))
+    
+    show_modal_spinner()
     
     if(engine() == "RPART"){
       mdl <<- rpart(as.formula(form), 
@@ -55,9 +73,8 @@ function(input, output, session) {
       })
     }
     
+    remove_modal_spinner()
+    
   })
-  
-  
-  
   
 }
