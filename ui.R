@@ -1,7 +1,7 @@
 fluidPage(
   
   # Application title
-  titlePanel("Segmentation"),
+  titlePanel("Segmentation v0.01"),
   
   # Sidebar with a slider input for number of bins
   fluidRow(
