@@ -45,9 +45,9 @@ function(input, output, session) {
       model_data_rpart <- model_data %>% 
         mutate(!! sym(input$dependent) := as.factor(!! sym(input$dependent)))
       
-      mdl <<- rpart(as.formula(form), 
+      mdl <<- rpart(as.formula(form),
                     data = model_data_rpart, 
-                    control = rpart.control(minbucket = input$par_minbucket, 
+                    control = rpart.control(minbucket = input$par_minbucket,
                                             cp = input$par_cp, 
                                             maxdepth = input$par_maxdepth))
       
@@ -59,7 +59,8 @@ function(input, output, session) {
     if(engine() == "CTREE"){
       rec <- recipe(model_data, formula = form) %>% 
         step_string2factor(all_string()) %>%
-        step_dummy(all_factor()) %>% 
+        update_role(contains(input$dependent), new_role = "target") %>% 
+        step_dummy(all_factor(), -has_role("target")) %>% 
         prep()
       
       model_data_ctree <- bake(rec, new_data = NULL) %>% 
@@ -74,7 +75,7 @@ function(input, output, session) {
                                             mincriterion = input$par_mincriterion))
       
       output$tree_plot <- renderPlot({
-        plot.party(mdl, main = paste("Segmentation via", engine()))
+        plot(mdl, main = paste("Segmentation via", engine()))
       })
     }
     
