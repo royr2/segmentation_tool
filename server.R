@@ -19,9 +19,10 @@ function(input, output, session) {
     stats_df <- paste0(
       
       "---------------------------------------------------------------------", "\n",
-      "Number of Rows:", scales::number(nrow(model_data), big.mark = ","), "\n",
-      "Number of Columns:", scales::number(ncol(model_data)), "\n", 
-      "---------------------------------------------------------------------")
+      "Number of Rows:", scales::number(nrow(model_data), big.mark = ","),     "\n",
+      "Number of Columns:", scales::number(ncol(model_data)),                  "\n", 
+      "---------------------------------------------------------------------"
+    )
     
     output$data_stats <- renderText(stats_df)
     
@@ -40,8 +41,12 @@ function(input, output, session) {
     show_modal_spinner()
     
     if(engine() == "RPART"){
+      
+      model_data_rpart <- model_data %>% 
+        mutate(!! sym(input$dependent) := as.factor(!! sym(input$dependent)))
+      
       mdl <<- rpart(as.formula(form), 
-                    data = model_data, 
+                    data = model_data_rpart, 
                     control = rpart.control(minbucket = input$par_minbucket, 
                                             cp = input$par_cp, 
                                             maxdepth = input$par_maxdepth))
